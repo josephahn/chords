@@ -2,6 +2,7 @@ from scrapy import Spider, Request
 from the_beatles_chords.items import TheBeatlesChordsItem
 import re
 import json
+from functools import reduce
 
 class TheBeatlesChordsSpider(Spider):
     name = 'the_beatles_chords_spider'
@@ -18,7 +19,9 @@ class TheBeatlesChordsSpider(Spider):
     def parse_page(self, response):
         data = response.css('div.js-store::attr(data-content)').get()
         tabs = json.loads(data)['store']['page']['data']['other_tabs']
-        tab_urls = list(map(lambda t: t['tab_url'], tabs))
+
+        # take only version 1 of songs
+        tab_urls = reduce(lambda acc,t: acc + [t['tab_url']] if t['version'] == 1 else acc, tabs, [])
 
         for url in tab_urls:
             yield Request(url=url, callback=self.parse_tab)
