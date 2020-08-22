@@ -14,6 +14,7 @@ class TheBeatlesChordsPipeline(object):
     def open_spider(self, spider):
         self.csvfile = open(self.filename, 'wb')
         self.exporter = CsvItemExporter(self.csvfile)
+        self.exporter.fields_to_export = ['name', 'chords']
         self.exporter.start_exporting()
 
     def close_spider(self, spider):
